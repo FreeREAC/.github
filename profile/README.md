@@ -38,8 +38,6 @@ Each piece is independent and composes with the others.
 
 ## Repositories
 
-**Live**
-
 - **[reac-repacer](https://github.com/FreeREAC/reac-repacer)** — transparent
   Layer-2 de-jitter / re-pacing relay for a REAC stream over a bursty Wi-Fi link.
   OpenWrt package (apk) + LuCI app.
@@ -47,18 +45,20 @@ Each piece is independent and composes with the others.
   across an OpenWrt network: 802.1q VLAN trunk (same LAN) or gretap tunnel (across
   Wi-Fi / L3). OpenWrt package (apk).
 
-**Coming**
-
-- **reac-aes67** — real-time REAC → AES67 (RTP L24) converter, transport-agnostic.
-- **reac-protocol** — the REAC protocol reference: wire format, how to capture and
-  analyse it yourself, and a separate firmware-findings section.
-- **reac-docs** — engineering findings (the Wi-Fi-jitter investigation → the
-  clocking / hardware verdict) and the rig recipe (transport + repacer + converter).
-- **reac-lab** — the raw working material the docs are distilled from: packet
-  captures and a working journal.
-- **reac-tools** — REAC traffic analysis and diagnostics (loss / jitter / cross-mix,
-  codec, probes).
-- **reac-label** — Roland M-series → channel-name labeller, feeds reac-aes67.
+- **[reac-aes67](https://github.com/FreeREAC/reac-aes67)** — real-time REAC → AES67
+  (RTP L24) converter, transport-agnostic. OpenWrt package (apk) + LuCI app.
+- **[reac-protocol](https://github.com/FreeREAC/reac-protocol)** — the REAC protocol
+  reference: wire format, how to capture and analyse it yourself, and a separate
+  firmware-findings doc.
+- **[reac-docs](https://github.com/FreeREAC/reac-docs)** — engineering findings (the
+  Wi-Fi-jitter investigation → the clocking / hardware verdict) and the rig recipe
+  (transport + re-pacer + converter).
+- **[reac-lab](https://github.com/FreeREAC/reac-lab)** — the raw working material the
+  docs are distilled from: design specs, on-site runbooks, captures.
+- **[reac-tools](https://github.com/FreeREAC/reac-tools)** — REAC traffic analysis and
+  diagnostics (loss / jitter / cross-mix, simulator, Wireshark dissector).
+- **[reac-label](https://github.com/FreeREAC/reac-label)** — Roland mixer → channel-name
+  labeller, feeds reac-aes67.
 
 ## License
 
