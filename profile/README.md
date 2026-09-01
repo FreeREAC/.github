@@ -26,8 +26,11 @@ REAC on commodity hardware (OpenWrt routers, Linux).
        |
   reac-transport carry REAC across an OpenWrt network: VLAN trunk | gretap tunnel
 
-  reac-protocol = the protocol reference     reac-tools = analysis / diagnostics
-  reac-docs     = findings + rig recipe       reac-lab  = raw captures + journal
+  libreac        shared C protocol library reac-aes67 and reac-repacer both build on
+
+  reac-protocol = the protocol reference     reac-tools    = analysis / diagnostics
+  reac-docs     = findings + rig recipe      reac-lab      = raw captures + journal
+                                              reac-analysis = numpy/scipy signal bench
 ```
 
 A REAC link is just Layer-2 frames. **reac-transport** puts them on a defined
@@ -47,6 +50,9 @@ Each piece is independent and composes with the others.
 
 - **[reac-aes67](https://github.com/FreeREAC/reac-aes67)** — real-time REAC → AES67
   (RTP L24) converter, transport-agnostic. OpenWrt package (apk) + LuCI app.
+- **[libreac](https://github.com/FreeREAC/libreac)** — the shared C protocol library:
+  mode descriptors, rate detection, frame helpers and the braid layout oracle that
+  reac-aes67 and reac-repacer both build on.
 - **[reac-protocol](https://github.com/FreeREAC/reac-protocol)** — the REAC protocol
   reference: wire format, how to capture and analyse it yourself, and a separate
   firmware-findings doc.
@@ -57,8 +63,12 @@ Each piece is independent and composes with the others.
   docs are distilled from: design specs, on-site runbooks, captures.
 - **[reac-tools](https://github.com/FreeREAC/reac-tools)** — REAC traffic analysis and
   diagnostics (loss / jitter / cross-mix, simulator, Wireshark dissector).
+- **[reac-analysis](https://github.com/FreeREAC/reac-analysis)** — numpy/scipy signal
+  bench for REAC audio: pitch, clock wobble, spectrum, glitch and PLC analysis.
 - **[reac-label](https://github.com/FreeREAC/reac-label)** — Roland mixer → channel-name
   labeller, feeds reac-aes67.
+- **[freereac.github.io](https://github.com/FreeREAC/freereac.github.io)** — the
+  package repository: signed RPMs for the tools that ship them.
 
 ## License
 
