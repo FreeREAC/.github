@@ -1,76 +1,60 @@
 # FreeREAC
 
-**REAC Exposed Audio Communications** — open documentation and tools for Roland's
-**REAC**, the audio-over-Ethernet protocol (EtherType `0x8819`) used by Roland
-digital mixers and stageboxes (the V-Mixer / M-series desks and their S-series
-boxes).
+Plug a Roland REAC stagebox into Linux, and it is ready.
 
-REAC carries many channels of low-latency digital audio as a flat Layer-2 broadcast
-on a dedicated link. The vendor publishes no specification for it. FreeREAC documents
-the wire format and behaviour from its own packet captures and interoperability
-analysis, and ships tools to **carry**, **de-jitter**, **convert**, and **analyse**
-REAC on commodity hardware (OpenWrt routers, Linux).
-
-> Reverse engineering for interoperability is permitted, and protocol interfaces are
-> not copyrightable. FreeREAC publishes its own findings, re-expressed in its own
-> words and tables; it does not redistribute any vendor firmware, binaries, or
-> decompilation listings. Not affiliated with or endorsed by Roland.
-> *(Not legal advice.)*
+FreeREAC reverse-engineered Roland's REAC — the proprietary Layer-2 protocol
+(EtherType `0x8819`) Roland's digital mixers use to carry many channels of
+audio to their stageboxes over one Ethernet cable — and proved the result on
+real hardware: an M-200 driving REAC at 44.1 and 48 kHz, an M-5000 at 96 kHz,
+and S-1608, S-4000S and S-0808 stageboxes on the other end. Head-amp control
+— gain, phantom power, pad — travels on the wire itself, a Linux box can take
+either the master or the slave role, and a segment can run over a tagged VLAN
+trunk rather than a dedicated cable.
 
 ## The stack
 
-```
-  reac-aes67     terminate REAC -> AES67 (RTP L24 multicast)      reac-label  channel names
-       |
-  reac-repacer   de-jitter a REAC stream carried over a bursty link (e.g. Wi-Fi)
-       |
-  reac-transport carry REAC across an OpenWrt network: VLAN trunk | gretap tunnel
-
-  libreac        shared C protocol library reac-aes67 and reac-repacer both build on
-
-  reac-protocol = the protocol reference     reac-tools    = analysis / diagnostics
-  reac-docs     = findings + rig recipe      reac-lab      = raw captures + journal
-                                              reac-analysis = numpy/scipy signal bench
-```
-
-A REAC link is just Layer-2 frames. **reac-transport** puts them on a defined
-segment (a tagged VLAN on one LAN, or a gretap tunnel across Wi-Fi / L3).
-**reac-repacer** sits on a jittery hop and re-clocks the stream so a clock-slave
-stagebox stays locked. **reac-aes67** terminates REAC into standard AES67 audio.
-Each piece is independent and composes with the others.
+Two layers. **libreac** (the protocol: frame codec, control block, head-amp
+records, box identity, master/slave state machines) and **libreac-transport**
+(built from the same repository: AF_PACKET sockets, the real-time pacer that
+clocks the wire, VLAN sub-interface handling) carry no opinion about audio
+APIs. **reac-pw** links both and puts a stagebox on a Linux PipeWire graph as
+source and sink nodes — no bridge, no second encapsulation.
 
 ## Repositories
 
-- **[reac-repacer](https://github.com/FreeREAC/reac-repacer)** — transparent
-  Layer-2 de-jitter / re-pacing relay for a REAC stream over a bursty Wi-Fi link.
-  OpenWrt package (apk) + LuCI app.
-- **[reac-transport](https://github.com/FreeREAC/reac-transport)** — carry REAC
-  across an OpenWrt network: 802.1q VLAN trunk (same LAN) or gretap tunnel (across
-  Wi-Fi / L3). OpenWrt package (apk).
+- **[libreac](https://github.com/FreeREAC/libreac)** — the REAC protocol and
+  its transport, libreac-transport, one repository and one release.
+- **[reac-pw](https://github.com/FreeREAC/reac-pw)** — the PipeWire-native
+  REAC endpoint; runs as master or as slave.
+- **[reac-protocol](https://github.com/FreeREAC/reac-protocol)** — the
+  wire-format reference every repository above is verified against.
 
-- **[reac-aes67](https://github.com/FreeREAC/reac-aes67)** — real-time REAC → AES67
-  (RTP L24) converter, transport-agnostic. OpenWrt package (apk) + LuCI app.
-- **[libreac](https://github.com/FreeREAC/libreac)** — the shared C protocol library:
-  mode descriptors, rate detection, frame helpers and the braid layout oracle that
-  reac-aes67 and reac-repacer both build on.
-- **[reac-protocol](https://github.com/FreeREAC/reac-protocol)** — the REAC protocol
-  reference: wire format, how to capture and analyse it yourself, and a separate
-  firmware-findings doc.
-- **[reac-docs](https://github.com/FreeREAC/reac-docs)** — engineering findings (the
-  Wi-Fi-jitter investigation → the clocking / hardware verdict) and the rig recipe
-  (transport + re-pacer + converter).
-- **[reac-lab](https://github.com/FreeREAC/reac-lab)** — the raw working material the
-  docs are distilled from: design specs, on-site runbooks, captures.
-- **[reac-tools](https://github.com/FreeREAC/reac-tools)** — REAC traffic analysis and
-  diagnostics (loss / jitter / cross-mix, simulator, Wireshark dissector).
-- **[reac-analysis](https://github.com/FreeREAC/reac-analysis)** — numpy/scipy signal
-  bench for REAC audio: pitch, clock wobble, spectrum, glitch and PLC analysis.
-- **[reac-label](https://github.com/FreeREAC/reac-label)** — Roland mixer → channel-name
-  labeller, feeds reac-aes67.
-- **[freereac.github.io](https://github.com/FreeREAC/freereac.github.io)** — the
-  package repository: signed RPMs for the tools that ship them.
+Also in the organisation: **[reac-tools](https://github.com/FreeREAC/reac-tools)**
+(capture analysis — loss, reordering, jitter, head-amp record parsing),
+**[reac-captures](https://github.com/FreeREAC/reac-captures)** (a CC0
+public-domain corpus of address-sanitised capture fixtures), and
+**[reac-aes67](https://github.com/FreeREAC/reac-aes67)** (a REAC-to-AES67
+bridge that runs on the router side, for routers with no PipeWire).
 
-## License
+## Install
 
-Code is GPL-3.0-or-later. The documentation is FreeREAC's own re-expression of
-observed protocol behaviour.
+Fedora 44:
+
+```
+sudo dnf config-manager addrepo --from-repofile=https://freereac.github.io/rpm/freereac.repo
+sudo rpm --import https://freereac.github.io/rpm/RPM-GPG-KEY-freereac
+sudo dnf install reac-pw
+```
+
+## Licence
+
+GPL-3.0-or-later, every repository.
+
+FreeREAC is an independent interoperability project, not affiliated with,
+sponsored by, or endorsed by Roland. REAC is a trademark of Roland
+Corporation, used here only to identify the protocol. No Roland firmware,
+binaries, symbols or decompilation listings are redistributed; everything
+published is FreeREAC's own re-expression of behaviour observed on its own
+equipment.
+
+More at [freereac.github.io/freereac-www](https://freereac.github.io/freereac-www/).
