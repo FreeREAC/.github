@@ -30,11 +30,9 @@ source and sink nodes — no bridge, no second encapsulation.
   wire-format reference every repository above is verified against.
 
 Also in the organisation: **[reac-tools](https://github.com/FreeREAC/reac-tools)**
-(capture analysis — loss, reordering, jitter, head-amp record parsing),
+(capture analysis — loss, reordering, jitter, head-amp record parsing) and
 **[reac-captures](https://github.com/FreeREAC/reac-captures)** (a CC0
-public-domain corpus of address-sanitised capture fixtures), and
-**[reac-aes67](https://github.com/FreeREAC/reac-aes67)** (a REAC-to-AES67
-bridge that runs on the router side, for routers with no PipeWire).
+public-domain corpus of address-sanitised capture fixtures).
 
 ## Install
 
