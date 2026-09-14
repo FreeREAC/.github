@@ -13,12 +13,15 @@ trunk rather than a dedicated cable.
 
 ## The stack
 
-Two layers. **libreac** (the protocol: frame codec, control block, head-amp
+Three pieces. **libreac** (the protocol: frame codec, control block, head-amp
 records, box identity, master/slave state machines) and **libreac-transport**
 (built from the same repository: AF_PACKET sockets, the real-time pacer that
 clocks the wire, VLAN sub-interface handling) carry no opinion about audio
 APIs. **reac-pw** links both and puts a stagebox on a Linux PipeWire graph as
-source and sink nodes — no bridge, no second encapsulation.
+source and sink nodes — no bridge, no second encapsulation. **reac-stageboxes**
+is a GTK4/libadwaita desktop app that sets phantom power, pad and sensitivity
+on every input of every box on the graph, through reac-pw's own node
+parameters.
 
 ## Repositories
 
@@ -26,6 +29,8 @@ source and sink nodes — no bridge, no second encapsulation.
   its transport, libreac-transport, one repository and one release.
 - **[reac-pw](https://github.com/FreeREAC/reac-pw)** — the PipeWire-native
   REAC endpoint; runs as master or as slave.
+- **[reac-stageboxes](https://github.com/FreeREAC/reac-stageboxes)** — the
+  desktop app for the preamps.
 - **[reac-protocol](https://github.com/FreeREAC/reac-protocol)** — the
   wire-format reference every repository above is verified against.
 
