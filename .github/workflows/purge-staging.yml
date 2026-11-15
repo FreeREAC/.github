@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+name: Purge the staging channel
+
+# FreeREAC's packages publish to the OpenMixer channel, staged during a release pass. A release chain run for this
+# organisation ends by dispatching this workflow here, on main (ops release-chain.sh: purge-staging.yml of
+# <org>/.github), and watching it to a green end. It is a caller only: the purge itself is Open-Mixer/.github's
+# reusable workflow, at the release line openmixer-v1, so there is one implementation.
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        type: string
+        default: 'purge'
+        description: 'The wave or pass, for the commit message'
+      dry-run:
+        type: boolean
+        default: false
+        description: 'Purge a pulled copy and push nothing'
+
+permissions:
+  contents: read
+
+jobs:
+  purge:
+    uses: Open-Mixer/.github/.github/workflows/purge-staging.yml@openmixer-v1
+    with:
+      reason: ${{ inputs.reason }}
+      dry-run: ${{ inputs.dry-run }}
+    secrets:
+      OPENMIXER_PACKAGES_SIGNING_KEY: ${{ secrets.OPENMIXER_PACKAGES_SIGNING_KEY }}
+      RPM_GPG_KEY: ${{ secrets.RPM_GPG_KEY }}
+      RPM_GPG_PASSPHRASE: ${{ secrets.RPM_GPG_PASSPHRASE }}
+      PAGES_TOKEN: ${{ secrets.PAGES_TOKEN }}
+      # this organisation holds the publish-commit key under its adopted name, as libreac's release passes it
+      SITE_GPG_KEY: ${{ secrets.OPENMIXER_CI_SIGNING_KEY }}
